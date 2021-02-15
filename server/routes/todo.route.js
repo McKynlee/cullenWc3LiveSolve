@@ -2,9 +2,15 @@ const express = require( 'express' );
 let router = express.Router();
 const pool = require( '../modules/pool' );
 
-router.delete( '/', ( req, res )=>{
-    console.log( 'in /task DELETE:' );
-    res.send( 'ribbet' );
+router.delete( '/:id', ( req, res )=>{
+    console.log( 'in /task DELETE:', req.params );
+    let queryString = 'DELETE FROM task WHERE id=$1';
+    pool.query( queryString, [ req.params.id ] ).then( ( results )=>{
+        res.sendStatus( 200 );
+    }).catch( ( err )=>{
+        console.log( err );
+        res.sendStatus( 400 )
+    }) //end query
 }) // end DELETE
 
 router.get( '/', ( req, res )=>{
@@ -23,12 +29,24 @@ router.get( '/', ( req, res )=>{
 
 router.post( '/', ( req, res )=>{
     console.log( 'in /task POST:', req.body );
-    res.send( 'woof' );
+    let queryString = 'INSERT INTO "task" (name) values ($1)';
+    pool.query( queryString, [ req.body.name ] ).then( ( result )=>{
+        res.sendStatus( 201 );
+    }).catch( ( err )=>{
+        console.log( err );
+        res.sendStatus( 400 );
+    }) // end query
 }) // end POST
 
-router.put( '/', ( req, res )=>{
-    console.log( 'in /task PUT:' );
-    res.send( 'chirp' );
+router.put( '/:id', ( req, res )=>{
+    console.log( 'in /task PUT:', req.params.id );
+    let queryString = 'UPDATE "task" SET "complete"=true WHERE id=$1';
+    pool.query( queryString, [ req.params.id ] ).then( ( results )=>{
+        res.sendStatus( 200 );
+    }).catch( ( err )=>{
+        console.log( err );
+        res.sendStatus( 400 )
+    } ) // end query;
 }) // end PUT
 
 module.exports = router;
